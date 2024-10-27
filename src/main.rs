@@ -1,8 +1,11 @@
 use clap::Subcommand;
+use log::error;
 use reqwest::blocking::ClientBuilder;
-use std::process::exit;
+use std::sync::Arc;
+mod cookies;
 mod login;
 use clap::{Args, Parser};
+use serde::{Deserialize, Serialize};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -20,7 +23,7 @@ enum Commands {
     Download,
 }
 
-#[derive(Args)]
+#[derive(Args, Serialize, Deserialize)]
 struct LoginArgs {
     username: String,
     password: String,
@@ -29,17 +32,27 @@ struct LoginArgs {
 fn main() {
     env_logger::init();
     let cli = Cli::parse();
-    let client = ClientBuilder::new()
-        .cookie_store(true)
-        .build()
-        .expect("unable to build reqwest client");
     match cli.command {
-        Commands::Download => {}
+        Commands::Download => {
+            let cookie_store = cookies::load_jar("cookies.json".to_owned());
+            let client = ClientBuilder::new()
+                .cookie_provider(Arc::clone(&cookie_store))
+                .build()
+                .expect("unable to build reqwest client");
+
+        }
         Commands::Login(args) => {
             let user = args.username;
             let pass = args.password;
+            let cookie_store = cookies::new_jar();
+            let client = ClientBuilder::new()
+                .cookie_provider(Arc::clone(&cookie_store))
+                .build()
+                .expect("unable to build reqwest client");
             if login::login(client, &user, &pass).is_none() {
-                exit(1);
+                error!("cannot login");
+            } else {
+                cookies::save_jar(cookie_store, "cookies.json".to_owned());
             }
         }
     }
