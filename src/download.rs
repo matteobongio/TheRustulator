@@ -5,6 +5,8 @@ use std::{fs::File, io::Write, path::Path};
 
 pub fn download(client: Client, url: String) {
     let tests = get_test_links(&client, &url);
+    std::fs::create_dir_all("./tests/in/").expect("can't create in dir");
+    std::fs::create_dir_all("./tests/out/").expect("can't create out dir");
     for test in tests {
         download_test(&client, &test).unwrap();
     }
@@ -19,7 +21,6 @@ fn get_test_links(client: &Client, url: &str) -> Vec<String> {
         if let Some(href) = element.value().attr("href") {
             if href.contains("%40tests/") {
                 let test_link = format!("https://themis.housing.rug.nl{}", href);
-                println!("{}", test_link);
                 tests.push(test_link);
             }
         }
@@ -36,10 +37,9 @@ fn download_test(client: &Client, url: &str) -> Result<usize> {
             "./tests/in/".to_string() + filename
         }
     };
-    std::fs::create_dir_all("./tests/in/").expect("can't create in dir");
-    std::fs::create_dir_all("./tests/out/").expect("can't create out dir");
     let path = Path::new(&path_str);
     let mut dest = File::create(Path::new(path)).unwrap();
     let data = client.get(url).send().unwrap().bytes().unwrap();
+    println!("downloading {}", filename);
     dest.write(&data)
 }
