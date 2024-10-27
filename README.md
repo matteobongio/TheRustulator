@@ -1,4 +1,4 @@
-# The Rustlulator
+# The Rustulator
 
 A rust port of [Themulator](https://github.com/Bgabri/Themulator)
 
