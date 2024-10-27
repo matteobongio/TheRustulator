@@ -2,9 +2,11 @@ use clap::Subcommand;
 use log::error;
 use reqwest::blocking::ClientBuilder;
 use std::sync::Arc;
+mod config;
 mod cookies;
-mod login;
 mod download;
+mod login;
+mod run;
 use clap::{Args, Parser};
 use serde::{Deserialize, Serialize};
 
@@ -22,6 +24,13 @@ enum Commands {
     Login(LoginArgs),
     /// Download Test Cases
     Download(DownloadArgs),
+    /// Run the test cases
+    Run(RunArgs),
+}
+
+#[derive(Args)]
+struct RunArgs {
+    executable: String,
 }
 
 #[derive(Args)]
@@ -38,9 +47,10 @@ struct LoginArgs {
 fn main() {
     env_logger::init();
     let cli = Cli::parse();
+    let jar_path = config::get_jar();
     match cli.command {
         Commands::Download(args) => {
-            let cookie_store = cookies::load_jar("cookies.json".to_owned());
+            let cookie_store = cookies::load_jar(jar_path);
             let client = ClientBuilder::new()
                 .cookie_provider(Arc::clone(&cookie_store))
                 .build()
@@ -59,8 +69,12 @@ fn main() {
             if login::login(client, &user, &pass).is_none() {
                 error!("cannot login");
             } else {
-                cookies::save_jar(cookie_store, "cookies.json".to_owned());
+                cookies::save_jar(cookie_store, jar_path);
             }
+        }
+        Commands::Run(exe) => {
+            // check if test cases exist
+            run::run(exe.executable);
         }
     }
 }
