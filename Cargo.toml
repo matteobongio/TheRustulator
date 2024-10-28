@@ -9,7 +9,7 @@ clap = { version = "4.5.20", features = ["derive"] }
 env_logger = "0.11.5"
 file_diff = "1.0.0"
 log = "0.4.22"
-reqwest = { version = "0.12.8", features = ["blocking", "cookies"] }
+reqwest = { version = "0.12.8", default-features = false,  features = ["blocking", "cookies", "rustls-tls"] }
 reqwest_cookie_store = "0.8.0"
 scraper = "0.20.0"
 serde = { version = "1.0.213", features = ["derive"] }
