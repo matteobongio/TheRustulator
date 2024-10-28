@@ -16,3 +16,7 @@ Options:
   -V, --version  Print version
 
 ```
+
+## Installing
+
+`cargo install --locked --git https://github.com/matteobongio/TheRustulator.git`
