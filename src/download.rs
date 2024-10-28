@@ -1,6 +1,7 @@
+use log::info;
 use reqwest::blocking::Client;
-use std::io::Result;
 use scraper::Selector;
+use std::io::Result;
 use std::{fs::File, io::Write, path::Path};
 
 pub fn download(client: Client, url: String) {
@@ -19,8 +20,9 @@ fn get_test_links(client: &Client, url: &str) -> Vec<String> {
     let mut tests: Vec<String> = Vec::new();
     for element in doc.select(&selector) {
         if let Some(href) = element.value().attr("href") {
-            if href.contains("%40tests/") {
+            if href.contains("%40tests/") || href.contains("@tests/") {
                 let test_link = format!("https://themis.housing.rug.nl{}", href);
+                info!("found {}", test_link);
                 tests.push(test_link);
             }
         }
