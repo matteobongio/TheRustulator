@@ -31,21 +31,17 @@ enum Commands {
 
 #[derive(Args)]
 struct RunArgs {
-    #[arg(short, long)]
     executable: String,
 }
 
 #[derive(Args)]
 struct DownloadArgs {
-    #[arg(short, long)]
     url: String,
 }
 
 #[derive(Args, Serialize, Deserialize)]
 struct LoginArgs {
-    #[arg(short, long)]
     username: String,
-    #[arg(short, long)]
     password: String,
     #[arg(short, long)]
     save: bool,
