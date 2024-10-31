@@ -43,6 +43,7 @@ struct DownloadArgs {
 struct LoginArgs {
     username: String,
     password: String,
+    /// save credentials to file
     #[arg(short, long)]
     save: bool,
 }
