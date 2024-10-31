@@ -1,3 +1,10 @@
+use std::{
+    fs::File,
+    io::{Read, Write},
+    path,
+};
+
+use clap::builder::Str;
 use log::{error, info};
 use reqwest::blocking::Client;
 use scraper::Selector;
@@ -25,4 +32,29 @@ fn get_csrf_token(login_page: &str) -> Option<String> {
         }
     }
     None
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LoginCredentials {
+    username: String,
+    password: String,
+}
+impl LoginCredentials {
+    pub fn new(username: String, password: String) -> LoginCredentials {
+        LoginCredentials { username, password }
+    }
+}
+
+pub fn read_credentials(path: String) -> LoginCredentials {
+    let mut file = File::open(&path).unwrap();
+    let mut buf = Vec::new();
+    file.read_to_end(&mut buf).unwrap();
+    let str = String::from_utf8(buf).unwrap();
+    toml::from_str(&str).unwrap()
+}
+
+pub fn save_credentials(credentials: LoginCredentials, path: String) {
+    let str = toml::to_string_pretty(&credentials).unwrap();
+    let mut file = File::create(&path).unwrap();
+    file.write_all(str.as_bytes()).unwrap();
 }

@@ -1,4 +1,9 @@
-use std::{fs::{self, File}, io::Write, path::Path, process::Command};
+use std::{
+    fs::{self, File},
+    io::Write,
+    path::Path,
+    process::Command,
+};
 
 pub fn run(executable: String) {
     let in_path = Path::new("./tests/in");
@@ -44,7 +49,8 @@ pub fn run(executable: String) {
             .arg("--leak-check=full")
             .arg(&executable)
             .arg(format!("< {}", in_file))
-            .output().unwrap();
+            .output()
+            .unwrap();
         if !output.stderr.is_empty() {
             let err = String::from_utf8(output.stderr.clone());
             if err.is_ok() {
@@ -54,7 +60,9 @@ pub fn run(executable: String) {
             }
         }
         let mut stdout_file = File::create("./tests/stdout").unwrap();
-        stdout_file.write_all(&output.stdout).expect("cannot write stdout to file");
+        stdout_file
+            .write_all(&output.stdout)
+            .expect("cannot write stdout to file");
         if file_diff::diff(&out_file, "./tests/stdout") {
             println!("PASSED: {}", in_file);
         } else {

@@ -1,7 +1,8 @@
 use clap::Subcommand;
 use log::error;
+use login::LoginCredentials;
 use reqwest::blocking::ClientBuilder;
-use std::sync::Arc;
+use std::{env::args, sync::Arc};
 mod config;
 mod cookies;
 mod download;
@@ -42,6 +43,7 @@ struct DownloadArgs {
 struct LoginArgs {
     username: String,
     password: String,
+    save: bool,
 }
 
 fn main() {
@@ -70,6 +72,11 @@ fn main() {
                 error!("cannot login");
             } else {
                 cookies::save_jar(cookie_store, jar_path);
+                if args.save {
+                    let file = config::get_credentials_file();
+                    let credentials = LoginCredentials::new(user, pass);
+                    login::save_credentials(credentials, file);
+                }
             }
         }
         Commands::Run(exe) => {
