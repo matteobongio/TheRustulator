@@ -1,10 +1,8 @@
 use std::{
     fs::File,
     io::{Read, Write},
-    path,
 };
 
-use clap::builder::Str;
 use log::{error, info};
 use reqwest::blocking::Client;
 use scraper::Selector;

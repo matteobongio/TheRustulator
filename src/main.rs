@@ -2,7 +2,7 @@ use clap::Subcommand;
 use log::error;
 use login::LoginCredentials;
 use reqwest::blocking::ClientBuilder;
-use std::{env::args, sync::Arc};
+use std::sync::Arc;
 mod config;
 mod cookies;
 mod download;
